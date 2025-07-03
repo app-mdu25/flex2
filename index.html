@@ -491,38 +491,53 @@
         });
         
         // ส่งข้อมูลไปยัง Google Apps Script
-        function submitData(data) {
-            fetch(scriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.result === 'success') {
-                    showSuccess('บันทึกข้อมูลสำเร็จ!', data.id, data.liff_link);
-                    form.reset();
-                    imagePreviewContainer.innerHTML = '';
-                    selectedImages = [];
-                } else {
-                    showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + (data.error || 'ไม่ทราบสาเหตุ'));
-                }
-            })
-            .catch(error => {
-                showError('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message);
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                resetSubmitButton();
-            });
+function submitData(data) {
+    // แสดงสถานะกำลังโหลด
+    submitBtn.disabled = true;
+    submitText.style.display = 'none';
+    loadingText.style.display = 'inline';
+
+    fetch(scriptUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        mode: 'no-cors' // เพิ่มบรรทัดนี้เพื่อลองแก้ปัญหา CORS
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.result === 'success') {
+            showSuccess('บันทึกข้อมูลสำเร็จ!', data.id, data.liff_link);
+            form.reset();
+            imagePreviewContainer.innerHTML = '';
+            selectedImages = [];
+        } else {
+            showError('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่ทราบสาเหตุ'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showError('การเชื่อมต่อล้มเหลว: ' + error.message);
+        
+        // แสดงข้อมูลเพิ่มเติมสำหรับ debugging
+        statusMessage.innerHTML += `
+            <p><strong>Debug Info:</strong></p>
+            <p>URL: ${scriptUrl}</p>
+            <p>Error Details: ${JSON.stringify(error, null, 2)}</p>
+        `;
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitText.style.display = 'inline';
+        loadingText.style.display = 'none';
+    });
+}
         
         // รีเซ็ตปุ่มส่ง
         function resetSubmitButton() {
