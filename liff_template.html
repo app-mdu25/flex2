@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <base target="_top">
+    <title><?= news.Headline ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            color: #4285F4;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .news-meta {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .news-content {
+            margin-bottom: 2rem;
+            white-space: pre-line;
+        }
+        .news-image {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .social-links {
+            margin-top: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .social-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        .social-link:hover {
+            background: #e0e0e0;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 8px 15px;
+            background: #4285F4;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1><?= news.Headline ?></h1>
+        
+        <div class="news-meta">
+            โพสต์เมื่อ: <?= new Date(news.Timestamp).toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) ?>
+        </div>
+        
+        <div class="news-content">
+            <?= news.Details ?>
+        </div>
+        
+        <? for (let i = 1; i <= 4; i++) { ?>
+            <? if (news[`Image${i}`]) { ?>
+                <img src="<?= news[`Image${i}`] ?>" class="news-image" alt="News Image <?= i ?>">
+            <? } ?>
+        <? } ?>
+        
+        <? if (news.ReadMoreLink) { ?>
+            <p><a href="<?= news.ReadMoreLink ?>" target="_blank" class="back-button">อ่านเพิ่มเติม</a></p>
+        <? } ?>
+        
+        <div class="social-links">
+            <? if (news.WebsiteLink) { ?>
+                <a href="<?= news.WebsiteLink ?>" target="_blank" class="social-link">เว็บไซต์</a>
+            <? } ?>
+            <? if (news.TiktokLink) { ?>
+                <a href="<?= news.TiktokLink ?>" target="_blank" class="social-link">TikTok</a>
+            <? } ?>
+            <? if (news.FacebookLink) { ?>
+                <a href="<?= news.FacebookLink ?>" target="_blank" class="social-link">Facebook</a>
+            <? } ?>
+        </div>
+        
+        <a href="#" onclick="window.close()" class="back-button">ปิด</a>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script>
+        liff.init({
+            liffId: 'YOUR_LIFF_ID' // แทนที่ด้วย LIFF ID จริงของคุณ
+        }).then(() => {
+            if (!liff.isLoggedIn()) {
+                liff.login({ redirectUri: window.location.href });
+            }
+            
+            // ตั้งค่าปุ่มแบ่งปัน
+            if (liff.isApiAvailable('shareTargetPicker')) {
+                // สามารถเพิ่มปุ่มแบ่งปันได้ที่นี่
+            }
+        }).catch(err => {
+            console.error('LIFF Initialization error:', err);
+        });
+    </script>
+</body>
+</html>
